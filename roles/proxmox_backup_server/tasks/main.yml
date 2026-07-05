@@ -31,3 +31,7 @@
     name: proxmox-backup-proxy
     state: started
     enabled: true
+
+- name: Show Proxmox Backup Server connection details
+  ansible.builtin.debug:
+    msg: "Open https://{{ ansible_host | default(inventory_hostname) }}:8007/ and sign in with the root account."
