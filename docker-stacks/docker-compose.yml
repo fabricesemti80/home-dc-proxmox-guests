@@ -97,6 +97,7 @@ services:
 networks:
   homelab_proxy:
     name: homelab_proxy
+    external: true
 
 volumes:
   docker_apps_uptime_kuma_data:
