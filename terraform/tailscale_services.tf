@@ -2,6 +2,7 @@ locals {
   tailscale_services = {
     beszel         = "Beszel"
     portainer      = "Portainer"
+    pulse          = "Pulse"
     start          = "Homepage dashboard"
     "technitium-0" = "Technitium primary"
     "uptime-kuma"  = "Uptime Kuma"
