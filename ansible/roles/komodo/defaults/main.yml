@@ -9,3 +9,9 @@ komodo_timezone: Europe/London
 komodo_database_username: admin
 komodo_initial_admin_username: admin
 komodo_disable_user_registration: true
+komodo_resource_sync_name: home-dc-service-hosts
+komodo_resource_sync_repo: fabricesemti80/home-dc-service-hosts
+komodo_resource_sync_branch: main
+komodo_resource_sync_paths:
+  - komodo/resources.toml
+komodo_run_resource_sync: true

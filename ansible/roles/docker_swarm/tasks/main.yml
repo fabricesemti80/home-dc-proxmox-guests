@@ -49,7 +49,9 @@
   ansible.builtin.set_fact:
     docker_swarm_existing_manager_host: "{{ item }}"
   loop: "{{ ansible_play_hosts }}"
-  when: hostvars[item].docker_swarm_state.stdout.split()[1] == "true"
+  when:
+    - not ansible_check_mode
+    - hostvars[item].docker_swarm_state.stdout.split()[1] == "true"
   run_once: true
 
 - name: Initialize swarm on manager
@@ -58,6 +60,7 @@
     --advertise-addr {{ docker_swarm_advertise_addr | default(ansible_host) }}
     --listen-addr {{ docker_swarm_listen_addr }}
   when:
+    - not ansible_check_mode
     - inventory_hostname == docker_swarm_manager_host
     - docker_swarm_state.stdout.split()[0] == "inactive"
     - docker_swarm_existing_manager_host is not defined
@@ -69,6 +72,7 @@
   run_once: true
   delegate_to: "{{ docker_swarm_existing_manager_host | default(docker_swarm_manager_host) }}"
   when:
+    - not ansible_check_mode
     - docker_swarm_existing_manager_host is defined
     - hostvars[docker_swarm_manager_host].docker_swarm_state.stdout.split()[0] == "inactive"
 
@@ -78,6 +82,7 @@
     --token {{ docker_swarm_manager_token.stdout }}
     {{ hostvars[docker_swarm_existing_manager_host].docker_swarm_advertise_addr | default(hostvars[docker_swarm_existing_manager_host].ansible_host) }}:{{ docker_swarm_port }}
   when:
+    - not ansible_check_mode
     - inventory_hostname == docker_swarm_manager_host
     - docker_swarm_existing_manager_host is defined
     - docker_swarm_state.stdout.split()[0] == "inactive"
@@ -95,12 +100,14 @@
     --token {{ docker_swarm_worker_token.stdout }}
     {{ hostvars[docker_swarm_manager_host].docker_swarm_advertise_addr | default(hostvars[docker_swarm_manager_host].ansible_host) }}:{{ docker_swarm_port }}
   when:
+    - not ansible_check_mode
     - inventory_hostname in groups['docker_swarm_workers']
     - docker_swarm_state.stdout.split()[0] == "inactive"
 
 - name: Demote managers listed as workers
   ansible.builtin.command: "docker node demote {{ inventory_hostname }}"
   when:
+    - not ansible_check_mode
     - inventory_hostname in groups['docker_swarm_workers']
     - docker_swarm_state.stdout.split()[1] == "true"
   delegate_to: "{{ docker_swarm_manager_host }}"
@@ -115,7 +122,9 @@
 
 - name: Create swarm overlay network
   ansible.builtin.command: "docker network create --driver overlay --attachable {{ docker_swarm_overlay_network }}"
-  when: docker_swarm_overlay_network_check.rc == 1
+  when:
+    - not ansible_check_mode
+    - docker_swarm_overlay_network_check.rc == 1
   run_once: true
   delegate_to: "{{ docker_swarm_manager_host }}"
 

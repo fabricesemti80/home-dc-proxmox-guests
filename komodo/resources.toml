@@ -1,11 +1,3 @@
-[[server]]
-name = "sentinel-0"
-tags = ["homelab", "swarm", "manager"]
-
-[server.config]
-address = "http://periphery:8120"
-enabled = true
-
 [[swarm]]
 name = "home-swarm"
 tags = ["homelab"]
