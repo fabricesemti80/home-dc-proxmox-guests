@@ -115,6 +115,59 @@
   when: not ansible_check_mode
   no_log: true
 
+- name: List Komodo variables
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ komodo_port }}/read/ListVariables"
+    method: POST
+    body_format: json
+    body: {}
+    headers:
+      X-Api-Key: "{{ lookup('ansible.builtin.env', 'KOMODO_API_KEY') }}"
+      X-Api-Secret: "{{ lookup('ansible.builtin.env', 'KOMODO_API_SECRET') }}"
+    status_code: 200
+  register: komodo_variables
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Create Komodo Technitium hostname variables
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ komodo_port }}/write/CreateVariable"
+    method: POST
+    body_format: json
+    body:
+      name: "{{ hostvars[item].technitium_node_env_var }}"
+      value: "{{ item }}"
+      description: "Ansible-managed Swarm hostname for {{ hostvars[item].technitium_node_env_var }}."
+      is_secret: false
+    headers:
+      X-Api-Key: "{{ lookup('ansible.builtin.env', 'KOMODO_API_KEY') }}"
+      X-Api-Secret: "{{ lookup('ansible.builtin.env', 'KOMODO_API_SECRET') }}"
+    status_code: 200
+  loop: "{{ groups['docker_swarm'] }}"
+  when:
+    - not ansible_check_mode
+    - hostvars[item].technitium_node_env_var is defined
+    - hostvars[item].technitium_node_env_var not in (komodo_variables.json | map(attribute='name') | list)
+  no_log: true
+
+- name: Update Komodo Technitium hostname variables
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ komodo_port }}/write/UpdateVariableValue"
+    method: POST
+    body_format: json
+    body:
+      name: "{{ hostvars[item].technitium_node_env_var }}"
+      value: "{{ item }}"
+    headers:
+      X-Api-Key: "{{ lookup('ansible.builtin.env', 'KOMODO_API_KEY') }}"
+      X-Api-Secret: "{{ lookup('ansible.builtin.env', 'KOMODO_API_SECRET') }}"
+    status_code: 200
+  loop: "{{ groups['docker_swarm'] }}"
+  when:
+    - not ansible_check_mode
+    - hostvars[item].technitium_node_env_var is defined
+  no_log: true
+
 - name: Refresh Komodo resource sync
   ansible.builtin.uri:
     url: "http://127.0.0.1:{{ komodo_port }}/write/RefreshResourceSyncPending"
