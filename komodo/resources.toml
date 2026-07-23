@@ -6,7 +6,7 @@ tags = ["homelab"]
 servers = ["sentinel-0"]
 
 [[stack]]
-name = "networking"
+name = "homelab-networking"
 tags = ["homelab", "dns"]
 deploy = true
 

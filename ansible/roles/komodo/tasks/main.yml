@@ -98,6 +98,39 @@
   when: not ansible_check_mode
   no_log: true
 
+- name: Ensure Komodo uses connected Periphery server
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ komodo_port }}/write/UpdateServer"
+    method: POST
+    body_format: json
+    body:
+      id: "{{ komodo_managed_server_name }}"
+      config:
+        address: ""
+        enabled: true
+    headers:
+      X-Api-Key: "{{ lookup('ansible.builtin.env', 'KOMODO_API_KEY') }}"
+      X-Api-Secret: "{{ lookup('ansible.builtin.env', 'KOMODO_API_SECRET') }}"
+    status_code: 200
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Refresh Komodo resource sync
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ komodo_port }}/write/RefreshResourceSyncPending"
+    method: POST
+    body_format: json
+    body:
+      sync: "{{ komodo_resource_sync_name }}"
+    headers:
+      X-Api-Key: "{{ lookup('ansible.builtin.env', 'KOMODO_API_KEY') }}"
+      X-Api-Secret: "{{ lookup('ansible.builtin.env', 'KOMODO_API_SECRET') }}"
+    status_code: 200
+  when:
+    - not ansible_check_mode
+    - komodo_run_resource_sync
+  no_log: true
+
 - name: Run Komodo resource sync
   ansible.builtin.uri:
     url: "http://127.0.0.1:{{ komodo_port }}/execute/RunSync"

@@ -15,3 +15,4 @@ komodo_resource_sync_branch: main
 komodo_resource_sync_paths:
   - komodo/resources.toml
 komodo_run_resource_sync: true
+komodo_managed_server_name: "{{ inventory_hostname }}"
