@@ -187,8 +187,8 @@ services:
     networks:
       - homelab_proxy_swarm
     ports:
-      - target: 3000
-        published: 3000
+      - target: 3443
+        published: 3443
         protocol: tcp
         mode: host
     environment:
@@ -210,9 +210,9 @@ services:
       docktail.service.enable: "true"
       docktail.service.direct: "false"
       docktail.service.name: technitium-companion
-      docktail.service.port: "3000"
+      docktail.service.port: "3443"
       docktail.service.service-port: "443"
-      docktail.service.protocol: http
+      docktail.service.protocol: https
       homepage.group: Infrastructure
       homepage.name: Technitium Companion
       homepage.icon: mdi-dns
